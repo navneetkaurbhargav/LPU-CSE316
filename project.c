@@ -12,9 +12,11 @@ void priorAssign(struct process* pp,int n)
 {
   for(int i=0;i<n;i++)
 {
-  pp[i].prior=1.0+((float)pp[i].waitt/pp[i].runt);
- printf("prior with pid :%d=%d\n",pp[i].pid,pp[i].prior);
-
+  if(pp[i].runt!=0)
+{
+  pp[i].prior=1.0+(((float)pp[i].waitt)/pp[i].runt);
+ printf("priority of process with pid %d: %.1f\n",pp[i].pid,pp[i].prior);
+}
 }
 }
 void assignWait(struct process*pp,int n)
@@ -27,29 +29,19 @@ void assignWait(struct process*pp,int n)
 
 int processAssign(struct process*pp,int n)
 {
-float max;
-
+float max=pp[0].prior;
+float temp;
  for( int j=0;j<n;j++)
 {
-  if(pp[j].runt!=0)
+  if(pp[j].prior>max)
 {
   max=pp[j].prior;
- break;
+  temp=j;
 }
+  
 }
-  for(int i=0;i<n;i++)
-{
- if(pp[i].runt!=0)
-{
-   if(pp[i].runt>max)
-     max=pp[i].prior;
-}
-}
-for(int i=0;i<n;i++)
-{
- if(pp[i].prior==max)
-    return i; 
-}
+return temp;
+
 }
   
 main()
@@ -76,15 +68,15 @@ printf("\nEnter the process run time");
 {
   printf("\nProcess %d :",i);
   scanf("%d",&p[i].runt);
-}
+}\
 int temp;
+
+ priorAssign(p,n);
+
 for(int i=0;i<n;i++)
 {
    a[i]=p[i].runt;
 }
-
- priorAssign(p,n);
-
 for(int i=0;i<n-1;i++)
 {
     for(int j=0;j<n-i-1;j++)
@@ -106,33 +98,43 @@ p[j].remt=p[j].runt;
    while((p[j].remt)--)
  {
   sleep(1);
-printf("process running with process id %d:%d\n",p[j].pid,p[j].remt);
+printf("********process running with process id %d: %d********\n",p[j].pid,p[j].remt);
 assignWait(p,n);
 priorAssign(p,n);
     	
  }
 p[j].runt=0; 
+p[j].prior=-1;
 }
 }
-int x;
+
 //n--;
-while(n)
+int m=n;
+int x;
+while(m)
 {
+int count=0;
+for(int i=0;i<n;i++)
+{
+  if(p[i].runt==0)
+   count++;
+}
+if(count==n)
+ break;
 x=processAssign(p,n);
 
 p[x].remt=p[x].runt;
    while((p[x].remt)--)
    {
      sleep(1);
-     printf("process running with process id %d:%d\n",p[x].pid,p[x].remt);
+     printf("********process timer with process id %d: %d********\n",p[x].pid,p[x].remt);
      assignWait(p,n);
      priorAssign(p,n);
    }
 p[x].runt=0;
-n=n-1;
+p[x].prior=-1;
+m=m-1;
 } 
-
-
 }
 
 
